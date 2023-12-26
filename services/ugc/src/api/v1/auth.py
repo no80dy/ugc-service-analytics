@@ -6,7 +6,7 @@ import time
 from fastapi import HTTPException, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-from ...core.config import settings
+from core.config import settings
 
 
 def decode_token(token: str) -> dict | None:
