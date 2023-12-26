@@ -102,7 +102,6 @@ __pycache__/
 local_settings.py
 
 .env
-.env.*
 !.env.*sample
 db.sqlite3
 

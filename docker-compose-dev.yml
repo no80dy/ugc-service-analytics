@@ -134,7 +134,8 @@ services:
 
   movies_ugc:
     build:
-      dockerfile: ./services/ugc/src/Dockerfile
+      context: services/ugc/src/
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
     env_file:
