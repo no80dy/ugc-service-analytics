@@ -2,6 +2,12 @@
 
 version: "3.9"
 
+x-services:
+  &clickhouse-service
+  image: clickhouse/clickhouse-server:23
+  depends_on:
+    - zookeeper
+
 services:
   kafka-0:
     image: bitnami/kafka:3.6
@@ -78,7 +84,7 @@ services:
     hostname: zookeeper
 
   clickhouse-node1:
-    image: clickhouse/clickhouse-server:23
+    <<: *clickhouse-service
     container_name: clickhouse-node1
     hostname: clickhouse-node1
     ports:
@@ -86,11 +92,9 @@ services:
       - "9000:9000"
     volumes:
       - ./data/node1:/etc/clickhouse-server
-    depends_on:
-      - zookeeper
 
   clickhouse-node2:
-    image: clickhouse/clickhouse-server:23
+    <<: *clickhouse-service
     container_name: clickhouse-node2
     hostname: clickhouse-node2
     ports:
@@ -98,11 +102,9 @@ services:
       - "9001:9000"
     volumes:
       - ./data/node2:/etc/clickhouse-server
-    depends_on:
-      - zookeeper
 
   clickhouse-node3:
-    image: clickhouse/clickhouse-server:23
+    <<: *clickhouse-service
     container_name: clickhouse-node3
     hostname: clickhouse-node3
     ports:
@@ -110,11 +112,9 @@ services:
       - "9002:9000"
     volumes:
       - ./data/node3:/etc/clickhouse-server
-    depends_on:
-      - zookeeper
 
   clickhouse-node4:
-    image: clickhouse/clickhouse-server:23
+    <<: *clickhouse-service
     container_name: clickhouse-node4
     hostname: clickhouse-node4
     ports:
@@ -122,8 +122,6 @@ services:
       - "9003:9000"
     volumes:
       - ./data/node4:/etc/clickhouse-server
-    depends_on:
-      - zookeeper
 
 
 volumes:
