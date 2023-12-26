@@ -1,5 +1,11 @@
-FROM python:3.10.1-slim
+FROM python:3.11-alpine
 
-# я до конца не понял, что у нас тут будет, фастапи или просто скрипт, поэтому не заполнил данный докерфайл
+WORKDIR /app
 
-CMD ...
+# set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+COPY . .
+
+CMD ["python", "./hello_world.py"]
