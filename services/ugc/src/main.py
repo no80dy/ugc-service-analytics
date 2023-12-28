@@ -7,15 +7,14 @@ from fastapi.responses import JSONResponse
 from kafka.admin import KafkaAdminClient, NewTopic
 from kafka.errors import TopicAlreadyExistsError
 
-from api.v1 import messages
+from api.v1 import events
 from core.config import settings
 from db import broker
 from db.kafka import KafkaBroker
 
 
-async def create_topic():
+async def create_topic(topic_name: str):
     """Создание топика в кафке автоматически перед принятием запросов"""
-    topic_name = 'film_events'
     try:
         logging.info('Start creating topic')
         admin_client = KafkaAdminClient(
@@ -37,7 +36,7 @@ async def lifespan(app: FastAPI):
         bootstrap_servers=f'{settings.kafka_brokers}'
     )
     # Автоматически создать топик в кафке
-    await create_topic()
+    await create_topic(settings.default_topic)
     yield
     await broker.kafka.close()
 
@@ -56,7 +55,7 @@ app = FastAPI(
 )
 
 
-app.include_router(messages.router, prefix='/ugc/api/v1/statistic', tags=['statistic'])
+app.include_router(events.router, prefix='/ugc/api/v1/statistic', tags=['statistic'])
 
 
 if __name__ == '__main__':

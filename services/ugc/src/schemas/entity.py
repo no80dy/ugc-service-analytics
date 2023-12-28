@@ -1,25 +1,26 @@
-from datetime import datetime
 from uuid import UUID
+from typing_extensions import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class UGCPayloads(BaseModel):
     user_id: UUID
+    film_id: UUID
 
 
 class FilmHistoryPayloads(UGCPayloads):
-    film_id: UUID
+    event_name: Literal['film_history']
     film_sec: int
 
 
 class FilmLikePayloads(UGCPayloads):
-    film_id: UUID
+    event_name: Literal['film_likes']
     like: bool
 
 
 class FilmCommentPayloads(UGCPayloads):
-    film_id: UUID
+    event_name: Literal['film_comments']
     comment: str
 
 
