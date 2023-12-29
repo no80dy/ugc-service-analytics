@@ -11,7 +11,6 @@ from logger import logger
 BACKOFF_MAX_TIME = 60
 
 if __name__ == '__main__':
-
     @backoff.on_exception(
         backoff.expo,
         (KafkaConnectionError, NoBrokersAvailable),
