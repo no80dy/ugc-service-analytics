@@ -1,7 +1,7 @@
 CREATE DATABASE shard;
 
 CREATE TABLE shard.users_activities (
-    id Int64,
+    id UUID,
     user_id UUID,
     film_id UUID,
     event_name String,
@@ -11,7 +11,7 @@ CREATE TABLE shard.users_activities (
 ) Engine=ReplicatedMergeTree('/clickhouse/tables/shard1/users_activities', 'replica_1') PARTITION BY toYYYYMMDD(event_time) ORDER BY id;
 
 CREATE TABLE default.users_activities (
-    id Int64,
+    id UUID,
     user_id UUID,
     film_id UUID,
     event_name String,

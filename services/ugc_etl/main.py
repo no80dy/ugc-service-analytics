@@ -4,6 +4,9 @@ import uuid
 from kafka import KafkaConsumer
 from clickhouse_driver import Client
 
+from models import UserActivityModel
+from queries import insert_query
+
 
 def get_data_from_kafka():
 	consumer = KafkaConsumer(
@@ -17,15 +20,33 @@ def get_data_from_kafka():
 
 	for message in consumer:
 		print(message.value)
-		data = message.value
-		event_data_ = {'event_data': {}}
-		event_data_json = json.dumps(
-			event_data_
-		)  # Преобразование в JSON-строку
-
+		user_activity = UserActivityModel(**message.value)
+		print(user_activity)
+		# query = client.substitute_params(
+		# 	insert_query,
+		# 	{
+		# 		'id': str(uuid.uuid4()),
+		# 		'user_id': str(user_activity.user_id),
+		# 		'film_id': str(user_activity.film_id),
+		# 		'event_name': user_activity.event_name,
+		# 		'comment': user_activity.comment,
+		# 		'film_sec': user_activity.film_sec,
+		# 		'event_time': user_activity.event_time.replace(microsecond=0)
+		# 	},
+		# 	client.connection.context
+		# )
+		# print(query)
 		client.execute(
-			f'INSERT INTO default.users_activity (id, user_id, film_id, event_name, event_data, event_time)'
-			f'VALUES (generateUUIDv4(), generateUUIDv4(), generateUUIDv4(), \'{str(data["event_name"])}\', \'{event_data_json}\', today())'
+			insert_query,
+			{
+				'id': str(uuid.uuid4()),
+				'user_id': str(user_activity.user_id),
+				'film_id': str(user_activity.film_id),
+				'event_name': user_activity.event_name,
+				'comment': user_activity.comment,
+				'film_sec': user_activity.film_sec,
+				'event_time': user_activity.event_time.replace(microsecond=0)
+			},
 		)
 
 

@@ -1,10 +1,15 @@
+import uuid
+
+from datetime import datetime
 from uuid import UUID
-from pydantic import (BaseModel)
+from pydantic import BaseModel, Field
 
 
 class UserActivityModel(BaseModel):
-	id: UUID
+	id: UUID = Field(default_factory=uuid.uuid4)
 	user_id: UUID
 	film_id: UUID
 	event_name: str
-	event_data: dict
+	comment: str | None = Field(default=None)
+	film_sec: int | None = Field(default=None)
+	event_time: datetime = Field(default_factory=datetime.now)

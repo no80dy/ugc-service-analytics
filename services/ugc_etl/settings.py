@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     project_name: str = 'ugc'
+
     kafka_brokers: str = 'kafka-0:9092,kafka-1:9092,kafka-2:9092'
     default_topic: str = 'film_events'
 

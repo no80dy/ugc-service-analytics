@@ -1,7 +1,7 @@
 CREATE DATABASE replica;
 
 CREATE TABLE replica.users_activities (
-    id Int64,
+    id UUID,
     user_id UUID,
     film_id UUID,
     event_name String,
