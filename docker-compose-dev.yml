@@ -127,14 +127,14 @@ services:
       - ./data/node4:/etc/clickhouse-server
       - ./data/node4:/docker-entrypoint-initdb.d
 
-#  ugc_etl:
-#    build:
-#      dockerfile: Dockerfile
-#      context: services/ugc_etl/
-#    env_file:
-#      - ./.env.dev
-#    volumes:
-#      - ./services/ugc_etl:/app
+  ugc_etl:
+    build:
+      dockerfile: Dockerfile
+      context: services/ugc_etl/
+    env_file:
+      - ./.env.dev
+    volumes:
+      - ./services/ugc_etl:/app
 
   movies_ugc:
     build:

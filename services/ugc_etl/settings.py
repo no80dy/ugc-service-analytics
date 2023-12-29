@@ -12,7 +12,11 @@ class Settings(BaseSettings):
     jwt_secret_key: str = 'secret'
     jwt_algorithm: str = 'HS256'
 
-    batch_size: int = 2
+    batch_size: int = 50
+
+    clickhouse_host: str = 'clickhouse-node1'
+    clickhouse_port: int = 9000
+    clickhouse_user: str = 'default'
 
 
 settings = Settings()

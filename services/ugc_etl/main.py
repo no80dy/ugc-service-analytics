@@ -1,8 +1,10 @@
 import json
-import uuid
+import backoff
 
 from kafka import KafkaConsumer
 from clickhouse_driver import Client
+from kafka.errors import KafkaError
+from clickhouse_driver.errors import Error as ClickHouseError
 
 from models import UserActivityModel
 from settings import settings
@@ -10,15 +12,31 @@ from queries import insert_query
 from logger import logger
 
 
+def connect_to_kafka() -> KafkaConsumer:
+	try:
+		consumer = KafkaConsumer(
+			'film_events',
+			bootstrap_servers=settings.kafka_brokers.split(','),
+			auto_offset_reset='earliest',
+			enable_auto_commit=True,
+			group_id='users-activities-messages',
+			value_deserializer=lambda m: json.loads(m.decode('utf-8'))
+		)
+		return consumer
+	except KafkaError as err:
+		logger.info(f'Error connecting to Kafka: {err}')
+
+
+def connect_to_clickhouse():
+	try:
+		return Client(host='clickhouse-node1')
+	except ClickHouseError as err:
+		logger.info(f'Error connecting to ClickHouse: {err}')
+
+
 def get_data_from_kafka():
-	consumer = KafkaConsumer(
-		'film_events',
-		bootstrap_servers=['localhost:9094', ],
-		auto_offset_reset='earliest',
-		group_id='echo-messages-to-stdout',
-		value_deserializer=lambda m: json.loads(m.decode('utf-8'))
-	)
-	client = Client(host='localhost')
+	consumer = connect_to_kafka()
+	client = connect_to_clickhouse()
 
 	user_activity_batch = []
 	for message in consumer:
