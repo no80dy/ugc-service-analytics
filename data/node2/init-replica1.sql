@@ -1,0 +1,11 @@
+CREATE DATABASE replica;
+
+CREATE TABLE replica.users_activities (
+    id Int64,
+    user_id UUID,
+    film_id UUID,
+    event_name String,
+    comment String,
+    film_sec Int64,
+    event_time DateTime
+) Engine=ReplicatedMergeTree('/clickhouse/tables/shard1/users_activities', 'replica_2') PARTITION BY toYYYYMMDD(event_time) ORDER BY id;
