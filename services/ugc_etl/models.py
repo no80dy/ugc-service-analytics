@@ -12,4 +12,5 @@ class UserActivityModel(BaseModel):
 	event_name: str
 	comment: str | None = Field(default=None)
 	film_sec: int | None = Field(default=None)
+	like: bool = Field(default=False)
 	event_time: datetime = Field(default_factory=datetime.now)

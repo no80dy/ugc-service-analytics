@@ -56,6 +56,7 @@ def get_data_from_kafka():
 						'event_name': user_activity_item.event_name,
 						'comment': user_activity_item.comment,
 						'film_sec': user_activity_item.film_sec,
+						'like': user_activity_item.like,
 						'event_time': user_activity_item.event_time.replace(microsecond=0)
 					},
 				)
