@@ -5,7 +5,9 @@ from kafka import KafkaConsumer
 from clickhouse_driver import Client
 
 from models import UserActivityModel
+from settings import settings
 from queries import insert_query
+from logger import logger
 
 
 def get_data_from_kafka():
@@ -18,36 +20,29 @@ def get_data_from_kafka():
 	)
 	client = Client(host='localhost')
 
+	user_activity_batch = []
 	for message in consumer:
-		print(message.value)
 		user_activity = UserActivityModel(**message.value)
-		print(user_activity)
-		# query = client.substitute_params(
-		# 	insert_query,
-		# 	{
-		# 		'id': str(uuid.uuid4()),
-		# 		'user_id': str(user_activity.user_id),
-		# 		'film_id': str(user_activity.film_id),
-		# 		'event_name': user_activity.event_name,
-		# 		'comment': user_activity.comment,
-		# 		'film_sec': user_activity.film_sec,
-		# 		'event_time': user_activity.event_time.replace(microsecond=0)
-		# 	},
-		# 	client.connection.context
-		# )
-		# print(query)
-		client.execute(
-			insert_query,
-			{
-				'id': str(uuid.uuid4()),
-				'user_id': str(user_activity.user_id),
-				'film_id': str(user_activity.film_id),
-				'event_name': user_activity.event_name,
-				'comment': user_activity.comment,
-				'film_sec': user_activity.film_sec,
-				'event_time': user_activity.event_time.replace(microsecond=0)
-			},
-		)
+		user_activity_batch.append(user_activity)
+
+		logger.info(f'Add in batch {user_activity}')
+
+		if len(user_activity_batch) >= settings.batch_size:
+			for user_activity_item in user_activity_batch:
+				client.execute(
+					insert_query,
+					{
+						'id': str(user_activity_item.id),
+						'user_id': str(user_activity_item.user_id),
+						'film_id': str(user_activity_item.film_id),
+						'event_name': user_activity_item.event_name,
+						'comment': user_activity_item.comment,
+						'film_sec': user_activity_item.film_sec,
+						'event_time': user_activity_item.event_time.replace(microsecond=0)
+					},
+				)
+				logger.info(f'Load to ClickHouse {user_activity_item}')
+			user_activity_batch.clear()
 
 
 if __name__ == '__main__':

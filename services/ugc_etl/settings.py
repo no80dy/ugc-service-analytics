@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     jwt_secret_key: str = 'secret'
     jwt_algorithm: str = 'HS256'
 
+    batch_size: int = 2
+
 
 settings = Settings()
 
