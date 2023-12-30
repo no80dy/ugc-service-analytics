@@ -5,8 +5,8 @@ CREATE TABLE replica.users_activities (
     user_id UUID,
     film_id UUID,
     event_name String,
-    comment String,
-    film_sec Int64,
-    like Bool,
+    comment Nullable(String),
+    film_sec Nullable(Int64),
+    like Nullable(Bool),
     event_time DateTime
 ) Engine=ReplicatedMergeTree('/clickhouse/tables/shard2/users_activities', 'replica_2') PARTITION BY toYYYYMMDD(event_time) ORDER BY id;

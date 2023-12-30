@@ -43,12 +43,12 @@ def get_data_from_kafka():
 		user_activity = UserActivityModel(**message.value)
 		user_activity_batch.append(user_activity)
 
-		logger.info(f'Add in batch {user_activity}')
+		logger.info(f'Added in batch {user_activity}')
 
 		if len(user_activity_batch) >= settings.batch_size:
-			for user_activity_item in user_activity_batch:
-				client.execute(
-					insert_query,
+			client.execute(
+				insert_query,
+				[
 					{
 						'id': str(user_activity_item.id),
 						'user_id': str(user_activity_item.user_id),
@@ -57,10 +57,12 @@ def get_data_from_kafka():
 						'comment': user_activity_item.comment,
 						'film_sec': user_activity_item.film_sec,
 						'like': user_activity_item.like,
-						'event_time': user_activity_item.event_time.replace(microsecond=0)
-					},
-				)
-				logger.info(f'Load to ClickHouse {user_activity_item}')
+						'event_time': user_activity_item.event_time.replace(microsecond=0),
+					}
+					for user_activity_item in user_activity_batch
+				]
+			)
+			logger.info(f'Loaded to ClickHouse {len(user_activity_batch)}')
 			user_activity_batch.clear()
 
 

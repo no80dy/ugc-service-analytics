@@ -145,6 +145,19 @@ services:
     env_file:
       - ./.env.dev
 
+  locust_master:
+    image: locustio/locust
+    ports:
+      - "8089:8089"
+    volumes:
+      - ./services/tests/load:/mnt/locust
+    command: -f /mnt/locust/main.py --master -H http://localhost:8000
+
+  locust_worker:
+    image: locustio/locust
+    volumes:
+      - ./services/tests/load:/mnt/locust
+    command: -f /mnt/locust/main.py --worker --master-host locust_master
 
 volumes:
   kafka_0_data:
