@@ -2,6 +2,7 @@
 <company>
     <profiles>
         <default>
+            <allow_experimental_object_type>1</allow_experimental_object_type>
             <distributed_ddl_entry_format_version>2</distributed_ddl_entry_format_version>
             <max_memory_usage>10000000000</max_memory_usage>
             <use_uncompressed_cache>0</use_uncompressed_cache>

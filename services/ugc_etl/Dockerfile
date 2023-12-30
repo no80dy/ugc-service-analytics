@@ -8,4 +8,11 @@ ENV PYTHONUNBUFFERED 1
 
 COPY . .
 
-CMD ["python", "./hello_world.py"]
+RUN apk update &&\
+    apk add bash &&\
+    pip install --no-cache-dir --upgrade pip &&\
+    pip install --no-cache-dir -r requirements.txt
+
+RUN chmod +x ./entrypoint-etl.sh
+
+ENTRYPOINT ["bash", "./entrypoint-etl.sh"]

@@ -92,6 +92,7 @@ services:
       - "9000:9000"
     volumes:
       - ./data/node1:/etc/clickhouse-server
+      - ./data/node1:/docker-entrypoint-initdb.d
 
   clickhouse-node2:
     <<: *clickhouse-service
@@ -102,6 +103,7 @@ services:
       - "9001:9000"
     volumes:
       - ./data/node2:/etc/clickhouse-server
+      - ./data/node2:/docker-entrypoint-initdb.d
 
   clickhouse-node3:
     <<: *clickhouse-service
@@ -112,6 +114,7 @@ services:
       - "9002:9000"
     volumes:
       - ./data/node3:/etc/clickhouse-server
+      - ./data/node3:/docker-entrypoint-initdb.d
 
   clickhouse-node4:
     <<: *clickhouse-service
@@ -122,6 +125,7 @@ services:
       - "9003:9000"
     volumes:
       - ./data/node4:/etc/clickhouse-server
+      - ./data/node4:/docker-entrypoint-initdb.d
 
   ugc_etl:
     build:
