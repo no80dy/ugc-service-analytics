@@ -3,3 +3,5 @@ backoff
 pydantic
 pydantic_settings
 clickhouse_driver
+aiochclient
+aiohttp
