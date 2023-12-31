@@ -64,7 +64,7 @@ def process_user_activity_batch(user_activity_batch, client):
     logger.info(f'Loaded to ClickHouse {len(user_activity_batch)}')
 
 
-def get_data_from_kafka():
+def load_data_to_clickhouse():
     with KafkaConsumerManager() as consumer, ClickHouseClientManager() as client:
         try:
             while True:
@@ -77,6 +77,6 @@ def get_data_from_kafka():
 
 if __name__ == '__main__':
     try:
-        get_data_from_kafka()
+        load_data_to_clickhouse()
     except Exception as e:
         logger.error(f'Unexpected error: {e}')

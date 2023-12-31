@@ -1,8 +1,12 @@
+import sys
 import backoff
-from time import sleep
 
+from time import sleep
+from pathlib import Path
 from clickhouse_driver.errors import Error as ClickHouseError
 from clickhouse_driver import connect
+
+sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 from settings import settings
 from logger import logger
