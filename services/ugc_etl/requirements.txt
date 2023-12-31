@@ -1,0 +1,7 @@
+kafka-python==2.0.2
+backoff
+pydantic
+pydantic_settings
+clickhouse_driver
+aiochclient
+aiohttp
