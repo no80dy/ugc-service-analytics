@@ -1,11 +1,24 @@
 import json
+
+import backoff
 from kafka import KafkaConsumer
 from clickhouse_driver import Client
+
+from kafka.errors import KafkaError
+from clickhouse_driver.errors import Error as ClickHouseError
 
 from models import UserActivityModel
 from settings import settings
 from queries import insert_query
 from logger import logger
+
+
+def on_kafka_backoff(details):
+    logger.warning(f"Kafka is not available. Retrying in {details['wait']:.2f} seconds.")
+
+
+def on_clickhouse_backoff(details):
+    logger.warning(f"ClickHouse is not available. Retrying in {details['wait']:.2f} seconds.")
 
 
 class KafkaConsumerManager:
@@ -26,13 +39,20 @@ class KafkaConsumerManager:
 
 class ClickHouseClientManager:
     def __enter__(self):
-        self.client = Client(host='clickhouse-node1')
+        self.client = Client(host=settings.clickhouse_host)
         return self.client
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.client.disconnect()
 
 
+@backoff.on_exception(
+    backoff.expo,
+    (KafkaError, ),
+    max_time=60,
+    logger=logger,
+    on_backoff=on_kafka_backoff
+)
 def consume_messages(consumer):
     user_activity_batch = []
     for message in consumer:
@@ -44,6 +64,13 @@ def consume_messages(consumer):
             return user_activity_batch
 
 
+@backoff.on_exception(
+    backoff.expo,
+    (ClickHouseError, ),
+    max_time=60,
+    logger=logger,
+    on_backoff=on_clickhouse_backoff
+)
 def process_user_activity_batch(user_activity_batch, client):
     client.execute(
         insert_query,
@@ -64,6 +91,12 @@ def process_user_activity_batch(user_activity_batch, client):
     logger.info(f'Loaded to ClickHouse {len(user_activity_batch)}')
 
 
+@backoff.on_exception(
+    backoff.expo,
+    (KafkaError, ClickHouseError, ),
+    max_time=60,
+    logger=logger
+)
 def load_data_to_clickhouse():
     with KafkaConsumerManager() as consumer, ClickHouseClientManager() as client:
         try:
