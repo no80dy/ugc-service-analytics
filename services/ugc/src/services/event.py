@@ -27,8 +27,9 @@ class EventService:
     ) -> bool:
         value = jsonable_encoder(event_payloads)
         key = str(value.get('user_id'))
+        await self.broker.connection.start()
         try:
-            self.broker.send(
+            await self.broker.send(
                 topic=topic,
                 key=key,
                 value=value
