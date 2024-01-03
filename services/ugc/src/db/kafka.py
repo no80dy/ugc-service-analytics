@@ -1,6 +1,7 @@
 import json
+
 from abc import ABC, abstractmethod
-from kafka import KafkaProducer
+from aiokafka import AIOKafkaProducer
 
 
 class IBroker(ABC):
@@ -15,13 +16,14 @@ class IBroker(ABC):
 
 class KafkaBroker(IBroker):
     def __init__(self, **kwargs) -> None:
-        self.connection = KafkaProducer(
+        self.connection = AIOKafkaProducer(
             value_serializer=lambda v: json.dumps(v).encode('utf-8'),
             key_serializer=str.encode,
-            **kwargs)
+            **kwargs
+        )
 
-    def send(self, **kwargs):
-        return self.connection.send(**kwargs)
+    async def send(self, **kwargs):
+        return await self.connection.send(**kwargs)
 
     async def close(self):
-        self.connection.close()
+        await self.connection.stop()

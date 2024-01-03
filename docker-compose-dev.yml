@@ -10,7 +10,7 @@ x-services:
 
 services:
   kafka-0:
-    image: bitnami/kafka:3.6
+    image: bitnami/kafka:latest
     ports:
      - "9094:29092"
     environment:
@@ -30,7 +30,7 @@ services:
 
 
   kafka-1:
-    image: docker.io/bitnami/kafka:3.6
+    image: docker.io/bitnami/kafka:latest
     ports:
       - "9095:29092"
     environment:
@@ -50,7 +50,7 @@ services:
     volumes:
       - kafka_1_data:/bitnami/kafka
   kafka-2:
-    image: docker.io/bitnami/kafka:3.6
+    image: docker.io/bitnami/kafka:latest
     ports:
       - "9096:29092"
     environment:
@@ -69,6 +69,19 @@ services:
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
     volumes:
       - kafka_2_data:/bitnami/kafka
+
+  kafka-init:
+    image: bitnami/kafka:latest
+    depends_on:
+      - kafka-0
+      - kafka-1
+      - kafka-2
+    entrypoint: [ '/bin/sh', '-c' ]
+    command: |
+      "
+      echo -e 'Creating kafka topics'
+      kafka-topics.sh --bootstrap-server kafka-0:9092 --create --if-not-exists --topic film_events --replication-factor 3 --partitions 3
+      "
 
   ui:
     image: provectuslabs/kafka-ui:v0.7.0
