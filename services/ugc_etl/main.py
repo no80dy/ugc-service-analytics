@@ -1,5 +1,3 @@
-import json
-
 import backoff
 
 from kafka.errors import KafkaError
@@ -10,6 +8,9 @@ from settings import settings
 from queries import insert_query
 from logger import logger
 from managers import KafkaConsumerManager, ClickHouseClientManager
+
+
+BACKOFF_MAX_TIME = 60
 
 
 def consume_messages(consumer):
@@ -46,7 +47,7 @@ def process_user_activity_batch(user_activity_batch, client):
 @backoff.on_exception(
     backoff.expo,
     (KafkaError, ClickHouseError, ),
-    max_time=120,
+    max_time=BACKOFF_MAX_TIME,
     logger=logger
 )
 def load_data_to_clickhouse():
