@@ -1,8 +1,6 @@
 import json
 
 import backoff
-from kafka import KafkaConsumer
-from clickhouse_driver import Client
 
 from kafka.errors import KafkaError
 from clickhouse_driver.errors import Error as ClickHouseError
@@ -11,31 +9,7 @@ from models import UserActivityModel
 from settings import settings
 from queries import insert_query
 from logger import logger
-
-
-class KafkaConsumerManager:
-    def __enter__(self):
-        self.consumer = KafkaConsumer(
-            'film_events',
-            bootstrap_servers=settings.kafka_brokers.split(','),
-            auto_offset_reset='earliest',
-            enable_auto_commit=True,
-            group_id='users-activities-messages',
-            value_deserializer=lambda m: json.loads(m.decode('utf-8'))
-        )
-        return self.consumer
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.consumer.close()
-
-
-class ClickHouseClientManager:
-    def __enter__(self):
-        self.client = Client(host=settings.clickhouse_host)
-        return self.client
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.client.disconnect()
+from managers import KafkaConsumerManager, ClickHouseClientManager
 
 
 def consume_messages(consumer):
@@ -72,7 +46,7 @@ def process_user_activity_batch(user_activity_batch, client):
 @backoff.on_exception(
     backoff.expo,
     (KafkaError, ClickHouseError, ),
-    max_time=60,
+    max_time=120,
     logger=logger
 )
 def load_data_to_clickhouse():
@@ -82,8 +56,9 @@ def load_data_to_clickhouse():
                 user_activity_batch = consume_messages(consumer)
                 if user_activity_batch:
                     process_user_activity_batch(user_activity_batch, client)
+                    consumer.commit()
         except KeyboardInterrupt:
-            logger.info("Stopping Kafka Consumer.")
+            logger.info("Stopping ETL pipeline...")
 
 
 if __name__ == '__main__':

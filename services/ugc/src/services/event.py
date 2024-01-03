@@ -3,7 +3,7 @@ from functools import lru_cache
 
 from fastapi import Depends
 from fastapi.encoders import jsonable_encoder
-from kafka.errors import KafkaTimeoutError
+from aiokafka.errors import KafkaTimeoutError
 
 from core.config import settings
 from db.broker import get_kafka

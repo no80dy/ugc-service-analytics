@@ -1,5 +1,4 @@
 import json
-import asyncio
 
 from abc import ABC, abstractmethod
 from aiokafka import AIOKafkaProducer
