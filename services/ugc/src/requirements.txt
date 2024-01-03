@@ -1,7 +1,6 @@
 fastapi==0.104.0
 pydantic==2.4.2
 pydantic_settings==2.0.3
-kafka-python==2.0.2
 
 uvicorn==0.12.2
 gunicorn
@@ -12,3 +11,5 @@ backoff==2.2.1
 requests==2.31.0
 
 PyJWT
+setuptools
+aiokafka==0.10.0
