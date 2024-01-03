@@ -22,4 +22,5 @@ RUN apk update &&\
 COPY . .
 
 RUN chmod +x ./entrypoint-fastapi.sh
+
 ENTRYPOINT ["./entrypoint-fastapi.sh"]

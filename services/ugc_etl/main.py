@@ -13,14 +13,6 @@ from queries import insert_query
 from logger import logger
 
 
-def on_kafka_backoff(details):
-    logger.warning(f"Kafka is not available. Retrying in {details['wait']:.2f} seconds.")
-
-
-def on_clickhouse_backoff(details):
-    logger.warning(f"ClickHouse is not available. Retrying in {details['wait']:.2f} seconds.")
-
-
 class KafkaConsumerManager:
     def __enter__(self):
         self.consumer = KafkaConsumer(
@@ -46,13 +38,6 @@ class ClickHouseClientManager:
         self.client.disconnect()
 
 
-@backoff.on_exception(
-    backoff.expo,
-    (KafkaError, ),
-    max_time=60,
-    logger=logger,
-    on_backoff=on_kafka_backoff
-)
 def consume_messages(consumer):
     user_activity_batch = []
     for message in consumer:
@@ -64,13 +49,6 @@ def consume_messages(consumer):
             return user_activity_batch
 
 
-@backoff.on_exception(
-    backoff.expo,
-    (ClickHouseError, ),
-    max_time=60,
-    logger=logger,
-    on_backoff=on_clickhouse_backoff
-)
 def process_user_activity_batch(user_activity_batch, client):
     client.execute(
         insert_query,
